@@ -32,14 +32,11 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 
 ( function ( api ) {
 	/**
-	* Overrides api.Value set method.
-	* Adds the setArgs {} param, allowing to pass additional contextual info.
-	*
-	* Set the value and trigger all bound callbacks.
-	*
-	* @param {mixed}  to - New value.
-	* @param {Object} setArgs - Additional arguments.
-	*/
+	 * Set the value and trigger all bound callbacks.
+	 *
+	 * @since 1.0
+	 * @param {object} to New value.
+	 */
 	api.Value.prototype.set = function( to ) {
 		var from      = this._value,
 			newValObj = {};
