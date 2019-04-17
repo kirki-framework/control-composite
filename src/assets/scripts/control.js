@@ -1,10 +1,7 @@
-/* global kirkiControlLoader */
 wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend( {
 
 	ready: function() {
-		var control = this,
-			value   = control.setting.get();
-
+		var control = this;
 		_.each( this.params.fields, function( field ) {
 			wp.customize.control.add(
 				new wp.customize.Control( field.settings, control.getCombinedFieldArgs( control, field ) ) 
@@ -19,6 +16,9 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 		});
 		if ( ! field.description ) {
 			params.description = '';
+		}
+		if ( ! field.label ) {
+			params.label = '';
 		}
 		params.id      = field.settings;
 		params.value   = control.setting._value[ params.id.replace( control.id + '[', '' ).replace( ']', '' ) ];
@@ -53,7 +53,7 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 		if ( 'object' === typeof from && 'object' !== typeof to ) {
 			if ( this.element && this.element[0] && this.element[0].attributes && this.element[0].attributes['data-kirki-customize-setting-link-key'] ) {
 				newValObj[ this.element[0].attributes['data-kirki-customize-setting-link-key'].nodeValue ] = to;
-				to = jQuery.extend( {}, from, newValObj )
+				to = jQuery.extend( {}, from, newValObj );
 			}
 		}
 
@@ -63,5 +63,5 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 		this.callbacks.fireWith( this, [ to, from ] );
 
 		return this;
-	}
+	};
 } )( wp.customize );

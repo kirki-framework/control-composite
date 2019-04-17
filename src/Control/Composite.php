@@ -108,18 +108,6 @@ class Composite extends Base {
 	 */
 	protected function content_template() {
 		?>
-		<#
-		data.choices = data.choices || {};
-		data.choices.alpha = data.choices.alpha || false;
-		#>
-		<label>
-			<# if ( data.label ) { #>
-				<span class="customize-control-title">{{{ data.label }}}</span>
-			<# } #>
-			<# if ( data.description ) { #>
-				<span class="description customize-control-description">{{{ data.description }}}</span>
-			<# } #>
-		</label>
 		<input class="composite-hidden-value" type="hidden" value="{{ JSON.stringify( data.value ) }}" {{{ data.link }}}>
 		<?php
 	}
