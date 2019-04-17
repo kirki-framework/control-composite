@@ -93,4 +93,34 @@ class Composite extends Base {
 		parent::to_json();
 		$this->json['fields'] = $this->fields;
 	}
+
+	/**
+	 * An Underscore (JS) template for this control's content (but not its container).
+	 *
+	 * Class variables for this control class are available in the `data` JS object;
+	 * export custom variables by overriding {@see WP_Customize_Control::to_json()}.
+	 *
+	 * @see WP_Customize_Control::print_template()
+	 *
+	 * @access protected
+	 * @since 1.0.8
+	 * @return void
+	 */
+	protected function content_template() {
+		?>
+		<#
+		data.choices = data.choices || {};
+		data.choices.alpha = data.choices.alpha || false;
+		#>
+		<label>
+			<# if ( data.label ) { #>
+				<span class="customize-control-title">{{{ data.label }}}</span>
+			<# } #>
+			<# if ( data.description ) { #>
+				<span class="description customize-control-description">{{{ data.description }}}</span>
+			<# } #>
+		</label>
+		<input class="composite-hidden-value" type="hidden" value="{{ JSON.stringify( data.value ) }}" {{{ data.link }}}>
+		<?php
+	}
 }
