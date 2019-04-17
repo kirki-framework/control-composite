@@ -6,9 +6,8 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 			value   = control.setting.get();
 
 		_.each( this.params.fields, function( field ) {
-			var combinedArgs = control.getCombinedFieldArgs( control, field ),
-				subControl   = wp.customize.control.add(
-				new wp.customize.Control( field.settings, combinedArgs ) 
+			wp.customize.control.add(
+				new wp.customize.Control( field.settings, control.getCombinedFieldArgs( control, field ) ) 
 			);
 		});
 	},
@@ -24,9 +23,48 @@ wp.customize.controlConstructor['kirki-composite'] = wp.customize.Control.extend
 		params.id      = field.settings;
 		params.value   = control.setting._value[ params.id.replace( control.id + '[', '' ).replace( ']', '' ) ];
 		params.content = '<li id="customize-control-' + field.settings.replace( /]/g, '' ).replace( /\[/g, '-' ) + '" class="customize-control customize-control-' + field.type + '"></li>';
-		params.link    = 'data-customize-setting-link="' + params.id + '"';
+		params.link    = 'data-customize-setting-link="' + control.id + '" data-kirki-customize-setting-link-key="' + params.id.replace( control.id + '[', '' ).replace( ']', '' ) + '"';
 		
 		return params;
 	},
 
 } );
+
+( function ( api ) {
+	/**
+	* Overrides api.Value set method.
+	* Adds the setArgs {} param, allowing to pass additional contextual info.
+	*
+	* Set the value and trigger all bound callbacks.
+	*
+	* @param {mixed}  to - New value.
+	* @param {Object} setArgs - Additional arguments.
+	*/
+	api.Value.prototype.set = function( to ) {
+		var from      = this._value,
+			newValObj = {};
+
+		to = this._setter.apply( this, arguments );
+		to = this.validate( to );
+
+		// Bail if the sanitized value is null or unchanged.
+		if ( null === to || _.isEqual( from, to ) ) {
+			return this;
+		}
+
+		// Kirki tweak: handle nested settings.
+		if ( 'object' === typeof from && 'object' !== typeof to ) {
+			if ( this.element && this.element[0] && this.element[0].attributes && this.element[0].attributes['data-kirki-customize-setting-link-key'] ) {
+				newValObj[ this.element[0].attributes['data-kirki-customize-setting-link-key'].nodeValue ] = to;
+				to = jQuery.extend( {}, from, newValObj )
+			}
+		}
+
+		this._value = to;
+		this._dirty = true;
+
+		this.callbacks.fireWith( this, [ to, from ] );
+
+		return this;
+	}
+} )( wp.customize );
